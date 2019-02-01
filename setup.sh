@@ -1,10 +1,12 @@
-ROOTFS_MOUNT_POINT=$1
+MOUNT_POINT=$1
+BOOT_PARTITION=boot
+ROOTFS_PARTITION=rootfs
 
 echo "Enabling serial communication"
-sudo echo "enable_uart=1" >> $ROOTFS_MOUNT_POINT/config.txt
+sudo echo "enable_uart=1" >> $MOUNT_POINT/$BOOT_PARTITION/config.txt
 
 echo "Enabling ssh access"
-sudo touch $ROOTFS_MOUNT_POINT/ssh
+sudo touch $MOUNT_POINT/$BOOT_PARTITION/ssh
 
 SSID=$(nmcli -t -f SSID dev wifi)
 echo "Setting up wifi connection $SSID"
@@ -18,7 +20,7 @@ network={
     \tssid=%s
     \t%s
     \tkey_mgmt=WPA-PSK
-}" "$SSID" "PSK_STR" > wpa_supplicant.conf
+}" "$SSID" "PSK_STR" | sudo tee $MOUNT_POINT/$ROOTFS_PARTITION/etc/wpa_supplicant/wpa_supplicant.conf
 
 #  All raspberry devices MAC addresses started with B8:27:EB.
 #  
